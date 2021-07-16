@@ -1,0 +1,55 @@
+import os
+import subprocess
+import sys
+import argparse
+
+SPAdes = '/usr/local/SPAdes-3.13.0-Linux/bin/spades.py'
+
+parser = argparse.ArgumentParser(description='Parameters for SPAdes')
+parser.add_argument('--pe1-1', '--input_directory for forward paired-end read', metavar="DIRNAME", dest='inp1', required=True, help='Required: Input directory with trimmed forward paired-end reads.')
+parser.add_argument('--pe1-2', '--input_directory for reverse paired-end read', metavar="DIRNAME", dest='inp2', required=True, help='Required: Input directory with trimmed reverse paired-end reads.')
+parser.add_argument('-o', '--output_dir', metavar="DIRNAME", dest='outdir', required=True, help='Required: Name of output directory to create.')
+parser.add_argument('-t', '--threads', metavar="INT", dest='threads', type=int, default=16)
+parser.add_argument('-m', '--memory', metavar="INT", dest='memory', type=int, default=250)
+args = parser.parse_args()
+
+
+inp1= args.inp1
+inp2 = args.inp2
+outdir = args.outdir
+threads = args.threads
+memory = args.memory
+
+
+print("created arguments")
+
+
+
+if os.path.exists(outdir):
+      print("Error: Output directory already exists.  Please choose different directory or remove old directory.")
+      quit()
+os.mkdir(outdir)
+os.mkdir('%s/assembled'%outdir)
+
+print("created outdir")
+
+
+SPAdes_log = open('%s/SPAdes_log.txt'%outdir,'a')
+
+print("starting SPAdes")
+
+comm = '%s -1 %s -2 %s -o %s/SPAdes_output'%(SPAdes, inp1, inp2, outdir)
+process = subprocess.Popen(comm, stdout=subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
+process.wait()
+SPAdes_log.write('\n'.join([x.decode('utf-8').rstrip('\n') for x in iter(process.stdout.readlines())]))
+SPAdes_log.write('\n'.join([x.decode('utf-8').rstrip('\n') for x in iter(process.stderr.readlines())]))
+SPAdes_log.write('bwa command: %s\n'%comm)
+
+print("completed")
+
+
+
+
+
+
+#/usr/local/SPAdes-3.13.0-Linux/bin/spades.py --pe1-1 /export/home/ajrobbins/trimmed/AV3_S3_L001_R1_tp.fastq.gz     --pe1-2 /export/home/ajrobbins/trimmed/AV3_S3_L001_R2_tp.fastq.gz -o /export/home/ajrobbins/SPAdes_output/assembled
