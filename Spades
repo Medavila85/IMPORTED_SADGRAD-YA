@@ -38,9 +38,9 @@ SPAdes_log = open('%s/SPAdes_log.txt'%outdir,'a')
 
 print("starting SPAdes")
 
-comm = '%s -1 %s -2 %s -o %s/SPAdes_output'%(SPAdes, inp1, inp2, outdir)
+comm = '%s -1 %s -2 %s -m %s -t %s -o %s/SPAdes_output'%(SPAdes, inp1, inp2, memory, threads, outdir)
 process = subprocess.Popen(comm, stdout=subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
-process.wait()
+#process.wait()
 SPAdes_log.write('\n'.join([x.decode('utf-8').rstrip('\n') for x in iter(process.stdout.readlines())]))
 SPAdes_log.write('\n'.join([x.decode('utf-8').rstrip('\n') for x in iter(process.stderr.readlines())]))
 SPAdes_log.write('bwa command: %s\n'%comm)
